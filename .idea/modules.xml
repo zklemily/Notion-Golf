@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/GolfForLife.iml" filepath="$PROJECT_DIR$/.idea/GolfForLife.iml" />
+      <module fileurl="file://$PROJECT_DIR$/leaderboard-info-service/leaderboard-info-service.iml" filepath="$PROJECT_DIR$/leaderboard-info-service/leaderboard-info-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/notion-page-service/notion-page-service.iml" filepath="$PROJECT_DIR$/notion-page-service/notion-page-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tournament-info-service/tournament-info-service.iml" filepath="$PROJECT_DIR$/tournament-info-service/tournament-info-service.iml" />
+    </modules>
+  </component>
+</project>

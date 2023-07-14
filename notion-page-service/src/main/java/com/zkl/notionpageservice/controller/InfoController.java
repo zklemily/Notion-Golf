@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/tournaments")
+@RequestMapping("/database")
 public class InfoController {
 
     private final NotionClient client;

@@ -6,7 +6,6 @@ import com.squareup.okhttp.Response;
 import com.zkl.notionpageservice.notion.config.NotionConfigProperties;
 import com.zkl.notionpageservice.notion.model.Database;
 import com.zkl.notionpageservice.notion.model.Page;
-import com.zkl.notionpageservice.notion.model.Tournament;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.http.*;
