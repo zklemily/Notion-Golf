@@ -2,9 +2,7 @@ package com.zkl.tournamentinfoservice.sportsdata.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zkl.tournamentinfoservice.sportsdata.model.LeaderboardResponse;
-import com.zkl.tournamentinfoservice.sportsdata.model.PlayerScore;
-import com.zkl.tournamentinfoservice.sportsdata.model.Tournament;
+import com.zkl.tournamentinfoservice.sportsdata.model.*;
 import com.zkl.tournamentinfoservice.sportsdata.config.SportsdataConfig;
 import org.springframework.stereotype.Service;
 
@@ -47,5 +45,35 @@ public class SportsdataService {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         LeaderboardResponse leaderboardResponse = objectMapper.readValue(response.body(), LeaderboardResponse.class);
         return leaderboardResponse.getPlayerScores();
+    }
+
+    public List<Player> getPlayers() throws IOException, InterruptedException {
+        String url = sportsdataConfig.getApiUrl() + "Players?key=" + sportsdataConfig.getAuthToken();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .build();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        List<Player> players = objectMapper.readValue(response.body(), new TypeReference<>() {});
+        return players;
+    }
+
+    public Player getPlayer(String playerId) throws IOException, InterruptedException {
+        String url = sportsdataConfig.getApiUrl() + "Player/" + playerId + "?key=" + sportsdataConfig.getAuthToken();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .build();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        Player player = objectMapper.readValue(response.body(), Player.class);
+        return player;
+    }
+
+    public List<News> getNews(String date) throws IOException, InterruptedException {
+        String url = sportsdataConfig.getApiUrl() + "NewsByDate/" + date + "?key=" + sportsdataConfig.getAuthToken();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .build();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        List<News> news = objectMapper.readValue(response.body(), new TypeReference<>() {});
+        return news;
     }
 }

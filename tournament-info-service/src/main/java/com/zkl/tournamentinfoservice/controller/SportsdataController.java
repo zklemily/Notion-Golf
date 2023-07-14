@@ -13,11 +13,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/tournaments")
-public class SportsdatatController {
+public class SportsdataController {
     private final SportsdataService sportsdataService;
 
     @Autowired
-    public SportsdatatController(SportsdataService sportsdataService) {
+    public SportsdataController(SportsdataService sportsdataService) {
         this.sportsdataService = sportsdataService;
     }
 
