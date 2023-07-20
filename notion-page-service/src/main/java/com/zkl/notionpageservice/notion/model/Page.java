@@ -1,17 +1,19 @@
 package com.zkl.notionpageservice.notion.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.time.LocalDateTime;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Page {
 
     private String object;
     private String id;
     @JsonProperty("created_time")
     private LocalDateTime createdTime;
-    @JsonProperty("lasted_edited_time")
+    @JsonProperty("last_edited_time")
     private LocalDateTime lastEditedTime;
     private String cover;
     private String icon;

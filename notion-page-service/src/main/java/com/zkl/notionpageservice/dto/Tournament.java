@@ -1,30 +1,35 @@
-package com.zkl.notionpageservice.notion.model;
+package com.zkl.notionpageservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
 
 public class Tournament {
-    @JsonProperty("name")
+    @JsonProperty("TournamentID")
+    private String id;
+    @JsonProperty("Name")
     private String name;
-    @JsonProperty("startDate")
+    @JsonProperty("StartDate")
     private LocalDate startDate;
-    @JsonProperty("endDate")
+    @JsonProperty("EndDate")
     private LocalDate endDate;
-    @JsonProperty("venue")
+    @JsonProperty("Venue")
     private String venue;
-    @JsonProperty("city")
+    @JsonProperty("City")
     private String city;
-    @JsonProperty("state")
+    @JsonProperty("State")
     private String state;
-    @JsonProperty("country")
+    @JsonProperty("Country")
     private String country;
-    @JsonProperty("inProgress")
-    private Boolean inProgress;
-    @JsonProperty("isOver")
-    private Boolean isOver;
+    @JsonProperty("Par")
+    private Double par;
+    @JsonProperty("Yards")
+    private Double yards;
 
-    public Tournament(String name, LocalDate startDate, LocalDate endDate, String venue, String city, String state, String country, Boolean inProgress, Boolean isOver) {
+    public Tournament() {
+    }
+
+    public Tournament(String name, LocalDate startDate, LocalDate endDate, String venue, String city, String state, String country, Double par, Double yards) {
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -32,8 +37,16 @@ public class Tournament {
         this.city = city;
         this.state = state;
         this.country = country;
-        this.inProgress = inProgress;
-        this.isOver = isOver;
+        this.par = par;
+        this.yards = yards;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -92,19 +105,34 @@ public class Tournament {
         this.country = country;
     }
 
-    public Boolean getInProgress() {
-        return inProgress;
+    public Double getPar() {
+        return par;
     }
 
-    public void setInProgress(Boolean inProgress) {
-        this.inProgress = inProgress;
+    public void setPar(Double par) {
+        this.par = par;
     }
 
-    public Boolean getOver() {
-        return isOver;
+    public Double getYards() {
+        return yards;
     }
 
-    public void setOver(Boolean over) {
-        isOver = over;
+    public void setYards(Double yards) {
+        this.yards = yards;
+    }
+
+    @Override
+    public String toString() {
+        return "Tournament{" +
+                "name='" + name + '\'' +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", venue='" + venue + '\'' +
+                ", city='" + city + '\'' +
+                ", state='" + state + '\'' +
+                ", country='" + country + '\'' +
+                ", par=" + par +
+                ", yards=" + yards +
+                '}';
     }
 }

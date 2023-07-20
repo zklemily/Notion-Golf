@@ -1,19 +1,22 @@
 package com.zkl.notionpageservice.notion.service;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.zkl.notionpageservice.notion.config.NotionConfigProperties;
 import com.zkl.notionpageservice.notion.model.Database;
 import com.zkl.notionpageservice.notion.model.Page;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 
 @Component
@@ -28,7 +31,7 @@ public class DatabaseService {
         this.restTemplate = restTemplate;
     }
 
-    public List<Page> query(String databaseId) {
+    public List<Page> getDatabase(String databaseId) {
 
         String url = notionConfigProps.apiUrl() + "/v1/databases/" + databaseId + "/query";
         log.info("Querying Notion database: {}", url);
@@ -51,25 +54,41 @@ public class DatabaseService {
         return headers;
     }
 
-    public Response create(String databaseId) throws IOException {
+    public HttpResponse<String> createPageInDatabase(String newContent) throws IOException, InterruptedException {
         String url = notionConfigProps.apiUrl() + "/v1/pages";
-        log.info("Querying Notion database: {}", url);
+//        log.info("Querying Notion database: {}", url);
 
-        OkHttpClient client = new OkHttpClient();
-        com.squareup.okhttp.MediaType mediaType = com.squareup.okhttp.MediaType.parse("application/json");
-        com.squareup.okhttp.RequestBody body = com.squareup.okhttp.RequestBody.create(mediaType,
-                "{\n  \"parent\": {\n    \"database_id\": \"" + databaseId + "\"\n  },\n  \"properties\": {\n    \"Name\": {\n      \"title\": [\n        {\n          \"text\": {\n            \"content\": \"KMPG Championship\"\n          }\n        }\n      ]\n    },\n    \"Country\": {\n      \"type\": \"select\",\n      \"select\": {\n        \"name\": \"USA\"\n      }\n    },\n    \"Is Over\": {\n      \"checkbox\": true\n    },\n    \"City\": {\n      \"rich_text\": [\n        {\n          \"text\": {\n            \"content\": \"New Jersey\"\n          }\n        }\n      ]\n    },\n    \"Venue\": {\n      \"rich_text\": [\n        {\n          \"text\": {\n            \"content\": \"NJ Country Club\"\n          }\n        }\n      ]\n    },\n    \"State\": {\n      \"select\": {\n        \"name\": \"NJ\"\n      }\n    },\n    \"Date\": {\n      \"date\": {\n        \"start\": \"2023-07-01\",\n        \"end\": \"2023-07-04\"\n      }\n    },\n    \"In Progress\": {\n      \"checkbox\": false\n    }\n  }\n}");
-        Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .addHeader("Notion-Version", "2022-06-28")
-                .addHeader("accept", "application/json")
-                .addHeader("content-type", "application/json")
-                .addHeader("Authorization", notionConfigProps.authToken())
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("accept", "application/json")
+                .header("Notion-Version", "2022-06-28")
+                .header("Content-Type", "application/json")
+                .header("Authorization", notionConfigProps.authToken())
+                .method("POST", HttpRequest.BodyPublishers.ofString(newContent))
                 .build();
-        Response response = client.newCall(request).execute();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
         return response;
     }
+
+    public HttpResponse<String> updateBlock(String blockId, String newContent) throws IOException, InterruptedException {
+        String url = notionConfigProps.apiUrl() + "/v1/blocks/" + blockId;
+        log.info("Querying Notion database: {}", url);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("accept", "application/json")
+                .header("Notion-Version", "2022-06-28")
+                .header("Content-Type", "application/json")
+                .header("Authorization", notionConfigProps.authToken())
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(newContent))
+                .build();
+
+
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        return response;
+    }
+
 
 
 }

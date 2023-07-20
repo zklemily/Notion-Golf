@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -34,6 +35,7 @@ public class SportsdataService {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         List<Tournament> tournaments = objectMapper.readValue(response.body(), new TypeReference<>() {
         });
+        tournaments.removeIf(tournament -> tournament.getEndDate().isBefore(LocalDate.now()));
         return tournaments;
     }
 

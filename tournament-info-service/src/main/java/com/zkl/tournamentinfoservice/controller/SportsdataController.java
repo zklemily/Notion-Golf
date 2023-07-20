@@ -24,8 +24,8 @@ public class SportsdataController {
     @GetMapping
     public List<Tournament> getTournaments() throws IOException, InterruptedException {
         List<Tournament> tournaments = sportsdataService.getTournaments();
-        for (int i = 0; i < 10; i++) {
-            System.out.println(tournaments.get(i));
+        for (Tournament tournament : tournaments) {
+            System.out.println(tournaments);
         }
         return tournaments;
     }

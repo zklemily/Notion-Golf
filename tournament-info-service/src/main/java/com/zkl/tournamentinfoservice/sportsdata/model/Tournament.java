@@ -23,16 +23,12 @@ public class Tournament {
     private String state;
     @JsonProperty("Country")
     private String country;
-    @JsonProperty("IsInProgress")
-    private Boolean inProgress;
-    @JsonProperty("IsOver")
-    private Boolean isOver;
     @JsonProperty("Par")
     private Double par;
     @JsonProperty("Yards")
     private Double yards;
 
-    public Tournament(String id, String name, LocalDate startDate, LocalDate endDate, String venue, String location, String city, String state, String country, Boolean inProgress, Boolean isOver, Double par, Double yards) {
+    public Tournament(String id, String name, LocalDate startDate, LocalDate endDate, String venue, String location, String city, String state, String country, Double par, Double yards) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
@@ -42,8 +38,6 @@ public class Tournament {
         this.city = city;
         this.state = state;
         this.country = country;
-        this.inProgress = inProgress;
-        this.isOver = isOver;
         this.par = par;
         this.yards = yards;
     }
@@ -120,22 +114,6 @@ public class Tournament {
         this.country = country;
     }
 
-    public Boolean getInProgress() {
-        return inProgress;
-    }
-
-    public void setInProgress(Boolean inProgress) {
-        this.inProgress = inProgress;
-    }
-
-    public Boolean getOver() {
-        return isOver;
-    }
-
-    public void setOver(Boolean over) {
-        isOver = over;
-    }
-
     public Double getPar() {
         return par;
     }
@@ -164,8 +142,6 @@ public class Tournament {
                 ", city='" + city + '\'' +
                 ", state='" + state + '\'' +
                 ", country='" + country + '\'' +
-                ", inProgress=" + inProgress +
-                ", isOver=" + isOver +
                 ", par=" + par +
                 ", yards=" + yards +
                 '}';
