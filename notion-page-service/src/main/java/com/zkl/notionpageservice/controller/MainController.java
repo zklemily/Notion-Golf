@@ -111,14 +111,10 @@ public class MainController {
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        Tournament test = new Tournament("558");
-        List<Tournament> testLst = new ArrayList<>();
-        testLst.add(test);
-
         List<Tournament> curTournaments = objectMapper.readValue(response.body(),  new TypeReference<>() {});
-//        if (curTournaments.isEmpty()) {
-//            return ResponseEntity.ok("No current tournaments.");
-//        }
+        if (curTournaments.isEmpty()) {
+            return ResponseEntity.ok("No current tournaments.");
+        }
 
         List<Page> pages = client.databases.getDatabase(notionConfigProperties.databaseId());
         List<Tournament> databaseTournaments = pages.stream().map(TournamentsService::mapPageToTournament).toList();
@@ -133,7 +129,7 @@ public class MainController {
             }
         }
 
-        for (Tournament tournament : testLst) {
+        for (Tournament tournament : curTournaments) {
             if (tourIdToPageId.containsKey(tournament.getId())) {
                 String getLeaderboardUrl = "http://localhost:8081/tournaments/" + tournament.getId();
                 request = HttpRequest.newBuilder()
@@ -146,6 +142,9 @@ public class MainController {
                 response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
                 List<PlayerScore> playerScores = objectMapper.readValue(response.body(),  new TypeReference<>() {});
+                if (playerScores.isEmpty()) {
+                    continue;
+                }
 
                 playerScores.sort(Comparator.comparing(PlayerScore::getRank).reversed());
 
@@ -206,14 +205,5 @@ public class MainController {
 
         return ResponseEntity.ok("Leaderboard is updated");
 
-    }
-
-    private int findMatchPlayerScore(List<PlayerScore> playerScores, String id) {
-        for (int i = 0; i < playerScores.size(); i++) {
-            if (playerScores.get(i).getId().equals(id)) {
-                return i;
-            }
-        }
-        return -1;
     }
 }
