@@ -26,7 +26,6 @@ public class NewsController {
     public List<News> getTodayNews() throws IOException, InterruptedException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String date = LocalDate.now().format(formatter);
-        List<News> news = sportsdataService.getNews("2023-07-12");
-        return news;
+        return sportsdataService.getNews(date);
     }
 }

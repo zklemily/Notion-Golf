@@ -1,13 +1,10 @@
 package com.zkl.notionpageservice.notion.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.zkl.notionpageservice.notion.config.NotionConfigProperties;
 import com.zkl.notionpageservice.notion.model.Database;
 import com.zkl.notionpageservice.notion.model.Page;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -120,6 +117,24 @@ public class DatabaseService {
 
     public HttpResponse<String> getBlockChildren(String blockId) throws IOException, InterruptedException {
         String url = notionConfigProps.apiUrl() + "/v1/blocks/" + blockId + "/children?page_size=100";
+        log.info("Querying Notion database: {}", url);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("accept", "application/json")
+                .header("Notion-Version", "2022-06-28")
+                .header("Content-Type", "application/json")
+                .header("Authorization", notionConfigProps.authToken())
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+
+
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        return response;
+    }
+
+    public HttpResponse<String> getBlock(String blockId) throws IOException, InterruptedException {
+        String url = notionConfigProps.apiUrl() + "/v1/blocks/" + blockId;
         log.info("Querying Notion database: {}", url);
 
         HttpRequest request = HttpRequest.newBuilder()

@@ -28,6 +28,20 @@ public class JsonService {
         return requestBody.toString();
     }
 
+    public String createHeaderBlockJsonPayload(String content) throws JSONException {
+        JSONObject requestBody = new JSONObject();
+        JSONObject heading = new JSONObject();
+        JSONObject text = new JSONObject().put("content", content);
+        JSONObject richTextElement = new JSONObject()
+                .put("type", "text")
+                .put("text", text);
+        heading.put("rich_text", new JSONArray(Collections.singletonList(richTextElement)));
+
+        requestBody.put("heading_3", heading);
+
+        return requestBody.toString();
+    }
+
     public String createTournamentJsonPayload(String databaseId, Tournament tournament) throws JSONException {
         JSONObject parent = new JSONObject().put("database_id", databaseId);
 

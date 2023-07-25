@@ -2,6 +2,7 @@ package com.zkl.notionpageservice.notion.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.time.LocalDateTime;
 
@@ -14,14 +15,15 @@ public class Block {
     @JsonProperty("last_edited_time")
     private LocalDateTime lastEditedTime;
     private String type;
-    private boolean isDatabase;
+    private JsonNode paragraph;
 
-    public Block(String object, String id, LocalDateTime createdTime, LocalDateTime lastEditedTime, String type) {
+    public Block(String object, String id, LocalDateTime createdTime, LocalDateTime lastEditedTime, String type, JsonNode paragraph) {
         this.object = object;
         this.id = id;
         this.createdTime = createdTime;
         this.lastEditedTime = lastEditedTime;
         this.type = type;
+        this.paragraph = paragraph;
     }
 
     public String getObject() {
@@ -62,5 +64,13 @@ public class Block {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public JsonNode getParagraph() {
+        return paragraph;
+    }
+
+    public void setParagraph(JsonNode paragraph) {
+        this.paragraph = paragraph;
     }
 }

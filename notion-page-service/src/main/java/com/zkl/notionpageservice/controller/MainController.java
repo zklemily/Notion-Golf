@@ -1,5 +1,6 @@
 package com.zkl.notionpageservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zkl.notionpageservice.dto.News;
@@ -26,6 +27,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.PatternSyntaxException;
 
 @RestController
 public class MainController {
@@ -58,8 +60,9 @@ public class MainController {
         List<News> news = objectMapper.readValue(response.body(), new TypeReference<>() {});
         if (!news.isEmpty()) {
             News today = news.get(0);
-            HttpResponse<String> titleResponse = client.databases.updateBlock(titleBlockId, jsonService.createBlockJsonPayload(today.getTitle()));
-            HttpResponse<String> contentResponse = client.databases.updateBlock(contentBlockId, jsonService.createBlockJsonPayload(today.getContent()));
+            HttpResponse<String> titleResponse = client.databases.updateBlock(titleBlockId, jsonService.createHeaderBlockJsonPayload(today.getTitle()));
+            HttpResponse<String> contentResponse = client.databases.updateBlock(contentBlockId,
+                    jsonService.createBlockJsonPayload(today.getContent() + "\nDate: " + today.getDate() + "\nSource: " + today.getUrl()));
 
             HttpHeaders headers = new HttpHeaders();
             response.headers().map().forEach(headers::addAll);
@@ -205,5 +208,20 @@ public class MainController {
 
         return ResponseEntity.ok("Leaderboard is updated");
 
+    }
+
+    @GetMapping("/get-fav-players")
+    public List<String> getFavPlayers() throws IOException, InterruptedException {
+        String blockId = "ebd7540c-244a-46b4-9067-8239cc365501";
+        HttpResponse<String> blockResponse = client.databases.getBlock(blockId);
+        Block block = objectMapper.readValue(blockResponse.body(), Block.class);
+        String players = block.getParagraph().get("rich_text").get(0).get("text").get("content").asText().replace("Players:", "").trim();;
+        try {
+            return Arrays.asList(players.split(",\\s*"));
+        } catch (PatternSyntaxException e) {
+            System.out.println("Error: Invalid input format.");
+            e.printStackTrace();
+            return null;
+        }
     }
 }
