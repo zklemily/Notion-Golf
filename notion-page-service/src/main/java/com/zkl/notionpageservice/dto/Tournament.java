@@ -3,6 +3,8 @@ package com.zkl.notionpageservice.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class Tournament {
     @JsonProperty("TournamentID")
@@ -29,7 +31,12 @@ public class Tournament {
     public Tournament() {
     }
 
-    public Tournament(String name, LocalDate startDate, LocalDate endDate, String venue, String city, String state, String country, Double par, Double yards) {
+    public Tournament(String id) {
+        this.id = id;
+    }
+
+    public Tournament(String id, String name, LocalDate startDate, LocalDate endDate, String venue, String city, String state, String country, Double par, Double yards) {
+        this.id = id;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -135,4 +142,21 @@ public class Tournament {
                 ", yards=" + yards +
                 '}';
     }
+
+//    @Override
+//    public boolean equals(Object obj) {
+//        if (this == obj) {
+//            return true;
+//        }
+//        if (obj == null || this.getClass() != obj.getClass()) {
+//            return false;
+//        }
+//        Tournament other = (Tournament) obj;
+//        return this.id.equals(other.getId());
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(id);
+//    }
 }

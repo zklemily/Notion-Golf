@@ -5,6 +5,7 @@ import com.zkl.tournamentinfoservice.sportsdata.model.Tournament;
 import com.zkl.tournamentinfoservice.sportsdata.service.SportsdataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,9 +31,13 @@ public class SportsdataController {
         return tournaments;
     }
 
+    @GetMapping("/current")
+    public List<Tournament> getCurrentTournaments() throws IOException, InterruptedException {
+        return sportsdataService.getCurrentTournaments();
+    }
+
     @GetMapping("/{tournamentId}")
-    public List<PlayerScore> getLeaderboard() throws IOException, InterruptedException {
-        List<PlayerScore> playerScores = sportsdataService.getLeaderboard("555");
-        return playerScores;
+    public List<PlayerScore> getLeaderboard(@PathVariable("tournamentId") String tournamentId) throws IOException, InterruptedException {
+        return sportsdataService.getLeaderboard(tournamentId);
     }
 }

@@ -13,6 +13,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SportsdataService {
@@ -39,6 +40,19 @@ public class SportsdataService {
         return tournaments;
     }
 
+    public List<Tournament> getCurrentTournaments() throws IOException, InterruptedException {
+        String url = sportsdataConfig.getApiUrl() + "Tournaments?key=" + sportsdataConfig.getAuthToken();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .build();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        List<Tournament> tournaments = objectMapper.readValue(response.body(), new TypeReference<>() {
+        });
+        tournaments.removeIf(tournament -> !tournament.isInProgress());
+        return tournaments;
+    }
+
     public List<PlayerScore> getLeaderboard(String tournamentId) throws IOException, InterruptedException {
         String url = sportsdataConfig.getApiUrl() + "Leaderboard/" + tournamentId + "?key=" + sportsdataConfig.getAuthToken();
         HttpRequest request = HttpRequest.newBuilder()
@@ -46,7 +60,10 @@ public class SportsdataService {
                 .build();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         LeaderboardResponse leaderboardResponse = objectMapper.readValue(response.body(), LeaderboardResponse.class);
-        return leaderboardResponse.getPlayerScores();
+        List<PlayerScore> scores = leaderboardResponse.getPlayerScores();
+        return scores.stream()
+                .filter(playerScore -> playerScore.getRank() != null && playerScore.getRank() <= 30)
+                .collect(Collectors.toList());
     }
 
     public List<Player> getPlayers() throws IOException, InterruptedException {

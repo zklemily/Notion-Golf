@@ -3,10 +3,16 @@ package com.zkl.notionpageservice.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zkl.notionpageservice.dto.News;
+import com.zkl.notionpageservice.dto.PlayerScore;
 import com.zkl.notionpageservice.notion.NotionClient;
 import com.zkl.notionpageservice.notion.config.NotionConfigProperties;
 import com.zkl.notionpageservice.dto.Tournament;
+import com.zkl.notionpageservice.notion.model.Block;
+import com.zkl.notionpageservice.notion.model.BlockResult;
+import com.zkl.notionpageservice.notion.model.Database;
+import com.zkl.notionpageservice.notion.model.Page;
 import com.zkl.notionpageservice.notion.service.JsonService;
+import com.zkl.notionpageservice.service.TournamentsService;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +24,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 
 @RestController
 public class MainController {
@@ -67,9 +73,9 @@ public class MainController {
 
     @GetMapping("/update-tournaments")
     public ResponseEntity<String> updateTournaments() throws IOException, InterruptedException, JSONException {
-        String getNewsUrl = "http://localhost:8081/tournaments";
+        String getTournamentsUrl = "http://localhost:8081/tournaments";
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(getNewsUrl))
+                .uri(URI.create(getTournamentsUrl))
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
@@ -91,5 +97,123 @@ public class MainController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/update-leaderboard")
+    public ResponseEntity<String> updateLeaderboard() throws IOException, InterruptedException, JSONException {
+        String getCurTournamentsUrl = "http://localhost:8081/tournaments/current";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(getCurTournamentsUrl))
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        Tournament test = new Tournament("558");
+        List<Tournament> testLst = new ArrayList<>();
+        testLst.add(test);
+
+        List<Tournament> curTournaments = objectMapper.readValue(response.body(),  new TypeReference<>() {});
+//        if (curTournaments.isEmpty()) {
+//            return ResponseEntity.ok("No current tournaments.");
+//        }
+
+        List<Page> pages = client.databases.getDatabase(notionConfigProperties.databaseId());
+        List<Tournament> databaseTournaments = pages.stream().map(TournamentsService::mapPageToTournament).toList();
+
+        Map<String, String> tourIdToPageId = new HashMap<>();
+        for (Tournament tournament : databaseTournaments) {
+            for (Page page : pages) {
+                String id = page.getProperties().get("ID").get("rich_text").get(0).get("text").get("content").asText();
+                if (id.equals(tournament.getId())) {
+                    tourIdToPageId.put(tournament.getId(), page.getId());
+                }
+            }
+        }
+
+        for (Tournament tournament : testLst) {
+            if (tourIdToPageId.containsKey(tournament.getId())) {
+                String getLeaderboardUrl = "http://localhost:8081/tournaments/" + tournament.getId();
+                request = HttpRequest.newBuilder()
+                        .uri(URI.create(getLeaderboardUrl))
+                        .header("Content-Type", "application/json")
+                        .GET()
+                        .build();
+
+                httpClient = HttpClient.newHttpClient();
+                response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+                List<PlayerScore> playerScores = objectMapper.readValue(response.body(),  new TypeReference<>() {});
+
+                playerScores.sort(Comparator.comparing(PlayerScore::getRank).reversed());
+
+                // test: change the data
+                playerScores.get(0).setBirdies(10.0);
+
+                String pageId = tourIdToPageId.get(tournament.getId());
+
+                String databaseId = null;
+                // check if the page has database
+                HttpResponse<String> blockResponse = client.databases.getBlockChildren(pageId);
+                BlockResult blockResult = objectMapper.readValue(blockResponse.body(), BlockResult.class);
+                List<Block> blocks = blockResult.getBlocks();
+                for (Block block : blocks) {
+                    if (block.getType().equals("database")) {
+                        databaseId = block.getId();
+                    }
+                }
+
+                if (databaseId == null) {
+                    // if no database, create one
+                    String playerScoreJson = jsonService.createPlayerScoreJsonPayload(pageId);
+                    HttpResponse<String> createDatabaseResponse = client.databases.createDatabase(playerScoreJson);
+                    Database database = objectMapper.readValue(createDatabaseResponse.body(), Database.class);
+                    databaseId = database.getId();
+                    // insert data into database
+                    for (PlayerScore playerScore : playerScores) {
+                        playerScoreJson = jsonService.insertPlayerScoreJsonPayload(databaseId, playerScore);
+                        client.databases.createPageInDatabase(playerScoreJson);
+                    }
+                } else {
+                    // update data directly
+                    // first need to fetch every row ("page") to get the page id in database, then update
+                    Map<String, String> playerIdToPageId = new HashMap<>();
+                    List<Page> curPages = client.databases.getDatabase(databaseId);
+                    for (Page curPage : curPages) {
+                        String curPlayerId = curPage.getProperties().get("Player ID").get("rich_text").get(0).get("text").get("content").asText();
+                        for (PlayerScore playerScore : playerScores) {
+                            if (playerScore.getId().equals(curPlayerId)) {
+                                playerIdToPageId.put(curPlayerId, curPage.getId());
+                            }
+                        }
+                    }
+                    // if the current player is already in database, update
+                    for (PlayerScore playerScore : playerScores) {
+                        if (playerIdToPageId.containsKey(playerScore.getId())) {
+                            String playerScoreJson = jsonService.updatePlayerScoreJsonPayload(playerScore);
+                            client.databases.updatePageInDatabase(playerIdToPageId.get(playerScore.getId()), playerScoreJson);
+                        } else {
+                            // otherwise, insert
+                            String playerScoreJson = jsonService.insertPlayerScoreJsonPayload(playerScore.getId(), playerScore);
+                            client.databases.createPageInDatabase(playerScoreJson);
+                        }
+                    }
+                }
+            }
+        }
+
+        return ResponseEntity.ok("Leaderboard is updated");
+
+    }
+
+    private int findMatchPlayerScore(List<PlayerScore> playerScores, String id) {
+        for (int i = 0; i < playerScores.size(); i++) {
+            if (playerScores.get(i).getId().equals(id)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

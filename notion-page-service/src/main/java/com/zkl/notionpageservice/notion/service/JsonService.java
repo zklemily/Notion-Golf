@@ -1,5 +1,6 @@
 package com.zkl.notionpageservice.notion.service;
 
+import com.zkl.notionpageservice.dto.PlayerScore;
 import com.zkl.notionpageservice.dto.Tournament;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -91,19 +92,185 @@ public class JsonService {
         dates.put("end", tournament.getEndDate().format(formatter));
         JSONObject date = new JSONObject().put("date", dates);
 
-        JSONObject properties = new JSONObject().put("Name", titleObj);
-        properties.put("Venue", venue);
-        properties.put("City", city);
-        properties.put("State", state);
-        properties.put("Country", country);
-        properties.put("Date", date);
-        properties.put("Par", par);
-        properties.put("Yards", yards);
+        JSONObject properties = new JSONObject()
+                .put("Name", titleObj)
+                .put("Venue", venue)
+                .put("City", city)
+                .put("State", state)
+                .put("Country", country)
+                .put("Date", date)
+                .put("Par", par)
+                .put("Yards", yards);
 
         JSONObject requestBody = new JSONObject().put("parent", parent);
         requestBody.put("properties", properties);
 
         return requestBody.toString();
 
+    }
+
+    public String createPlayerScoreJsonPayload(String parentPageId) throws JSONException {
+        JSONObject parent = new JSONObject()
+                .put("type", "page_id")
+                .put("page_id", parentPageId);
+
+        JSONArray title = new JSONArray();
+        JSONObject titleContent = new JSONObject()
+                .put("type", "text")
+                .put("text", new JSONObject().put("content", "Leaderboard"));
+        title.put(titleContent);
+
+        JSONObject name = new JSONObject()
+                .put("type", "title")
+                .put("name", "Name")
+                .put("title", new JSONObject());
+
+        JSONObject playerId = new JSONObject()
+                .put("rich_text", new JSONObject());
+
+        JSONObject country = new JSONObject()
+                .put("select", new JSONObject());
+
+        JSONObject totalScore = new JSONObject()
+                .put("number", new JSONObject().put("format", "number"));
+
+        JSONObject totalStrokes = new JSONObject()
+                .put("number", new JSONObject().put("format", "number"));
+
+        JSONObject pars = new JSONObject()
+                .put("number", new JSONObject().put("format", "number"));
+
+        JSONObject birdies = new JSONObject()
+                .put("number", new JSONObject().put("format", "number"));
+
+        JSONObject eagles = new JSONObject()
+                .put("number", new JSONObject().put("format", "number"));
+
+        JSONObject bogeys = new JSONObject()
+                .put("number", new JSONObject().put("format", "number"));
+
+        JSONObject teeTime = new JSONObject()
+                .put("date", new JSONObject());
+
+        JSONObject rank = new JSONObject()
+                .put("number", new JSONObject().put("format", "number"));
+
+        JSONObject properties = new JSONObject()
+                .put("Name", name)
+                .put("Rank", rank)
+                .put("Country", country)
+                .put("Tee Time", teeTime)
+                .put("Total Score", totalScore)
+                .put("Total Strokes", totalStrokes)
+                .put("Eagles", eagles)
+                .put("Birdies", birdies)
+                .put("Pars", pars)
+                .put("Bogeys", bogeys)
+                .put("Player ID", playerId);
+
+        JSONObject requestBody = new JSONObject().put("parent", parent)
+                .put("title", title)
+                .put("properties", properties)
+                .put("is_inline", true);
+
+        System.out.println(requestBody);
+
+        return requestBody.toString();
+    }
+
+    public String insertPlayerScoreJsonPayload(String databaseId, PlayerScore playerScore) throws JSONException {
+        JSONObject parent = new JSONObject()
+                .put("database_id", databaseId);
+
+        JSONObject name = new JSONObject()
+                .put("title", new JSONArray().put(new JSONObject().put("text", new JSONObject().put("content", playerScore.getName()))));
+
+        JSONObject playerId = new JSONObject()
+                .put("rich_text", new JSONArray().put(new JSONObject().put("text", new JSONObject().put("content", playerScore.getId()))));
+
+        JSONObject country = new JSONObject()
+                .put("select", new JSONObject().put("name", playerScore.getCountry()));
+
+        JSONObject totalScore = new JSONObject()
+                .put("number", playerScore.getScore());
+
+        JSONObject totalStrokes = new JSONObject()
+                .put("number", playerScore.getStrokes());
+
+        JSONObject pars = new JSONObject()
+                .put("number", playerScore.getPars());
+
+        JSONObject birdies = new JSONObject()
+                .put("number", playerScore.getBirdies());
+
+        JSONObject eagles = new JSONObject()
+                .put("number", playerScore.getEagles());
+
+        JSONObject bogeys = new JSONObject()
+                .put("number", playerScore.getBogeys());
+
+        JSONObject teeTime = new JSONObject()
+                .put("date", new JSONObject().put("start", playerScore.getTeeTime()));
+
+        JSONObject rank = new JSONObject()
+                .put("number", playerScore.getRank());
+
+        JSONObject properties = new JSONObject()
+                .put("Name", name)
+                .put("Rank", rank)
+                .put("Country", country)
+                .put("Tee Time", teeTime)
+                .put("Total Score", totalScore)
+                .put("Total Strokes", totalStrokes)
+                .put("Eagles", eagles)
+                .put("Birdies", birdies)
+                .put("Pars", pars)
+                .put("Bogeys", bogeys)
+                .put("Player ID", playerId);
+
+        JSONObject requestBody = new JSONObject().put("parent", parent);
+        requestBody.put("properties", properties);
+
+        return requestBody.toString();
+    }
+
+    public String updatePlayerScoreJsonPayload(PlayerScore playerScore) throws JSONException {
+        JSONObject totalScore = new JSONObject()
+                .put("number", playerScore.getScore());
+
+        JSONObject totalStrokes = new JSONObject()
+                .put("number", playerScore.getStrokes());
+
+        JSONObject pars = new JSONObject()
+                .put("number", playerScore.getPars());
+
+        JSONObject birdies = new JSONObject()
+                .put("number", playerScore.getBirdies());
+
+        JSONObject eagles = new JSONObject()
+                .put("number", playerScore.getEagles());
+
+        JSONObject bogeys = new JSONObject()
+                .put("number", playerScore.getBogeys());
+
+        JSONObject teeTime = new JSONObject()
+                .put("date", new JSONObject().put("start", playerScore.getTeeTime()));
+
+        JSONObject rank = new JSONObject()
+                .put("number", playerScore.getRank());
+
+        JSONObject properties = new JSONObject()
+                .put("Rank", rank)
+                .put("Tee Time", teeTime)
+                .put("Total Score", totalScore)
+                .put("Total Strokes", totalStrokes)
+                .put("Eagles", eagles)
+                .put("Birdies", birdies)
+                .put("Pars", pars)
+                .put("Bogeys", bogeys);
+
+        JSONObject requestBody = new JSONObject().put("properties", properties);
+
+        return requestBody.toString();
     }
 }

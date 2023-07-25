@@ -5,15 +5,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Database {
+public class BlockResult {
     private String object;
-    private String id;
     @JsonProperty("results")
-    private List<Page> pages = new ArrayList<>();
+    private List<Block> blocks = new ArrayList<>();
     @JsonProperty("next_cursor")
     private Boolean nextCursor;
     @JsonProperty("has_more")
     private Boolean hasMore;
+
+    public BlockResult(String object, List<Block> blocks, Boolean nextCursor, Boolean hasMore) {
+        this.object = object;
+        this.blocks = blocks;
+        this.nextCursor = nextCursor;
+        this.hasMore = hasMore;
+    }
 
     public String getObject() {
         return object;
@@ -23,20 +29,12 @@ public class Database {
         this.object = object;
     }
 
-    public String getId() {
-        return id;
+    public List<Block> getBlocks() {
+        return blocks;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public List<Page> getPages() {
-        return pages;
-    }
-
-    public void setPages(List<Page> pages) {
-        this.pages = pages;
+    public void setBlocks(List<Block> blocks) {
+        this.blocks = blocks;
     }
 
     public Boolean getNextCursor() {
@@ -53,16 +51,5 @@ public class Database {
 
     public void setHasMore(Boolean hasMore) {
         this.hasMore = hasMore;
-    }
-
-    @Override
-    public String toString() {
-        return "Database{" +
-                "object='" + object + '\'' +
-                ", id='" + id + '\'' +
-                ", pages=" + pages +
-                ", nextCursor=" + nextCursor +
-                ", hasMore=" + hasMore +
-                '}';
     }
 }

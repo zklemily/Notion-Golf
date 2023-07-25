@@ -27,8 +27,10 @@ public class Tournament {
     private Double par;
     @JsonProperty("Yards")
     private Double yards;
+    @JsonProperty("IsInProgress")
+    private boolean inProgress;
 
-    public Tournament(String id, String name, LocalDate startDate, LocalDate endDate, String venue, String location, String city, String state, String country, Double par, Double yards) {
+    public Tournament(String id, String name, LocalDate startDate, LocalDate endDate, String venue, String location, String city, String state, String country, Double par, Double yards, boolean inProgress) {
         this.id = id;
         this.name = name;
         this.startDate = startDate;
@@ -40,6 +42,7 @@ public class Tournament {
         this.country = country;
         this.par = par;
         this.yards = yards;
+        this.inProgress = inProgress;
     }
 
     public String getId() {
@@ -130,6 +133,14 @@ public class Tournament {
         this.yards = yards;
     }
 
+    public boolean isInProgress() {
+        return inProgress;
+    }
+
+    public void setInProgress(boolean inProgress) {
+        this.inProgress = inProgress;
+    }
+
     @Override
     public String toString() {
         return "Tournament{" +
@@ -144,6 +155,7 @@ public class Tournament {
                 ", country='" + country + '\'' +
                 ", par=" + par +
                 ", yards=" + yards +
+                ", inProgress=" + inProgress +
                 '}';
     }
 }

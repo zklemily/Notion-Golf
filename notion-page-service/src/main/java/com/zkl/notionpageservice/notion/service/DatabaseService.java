@@ -31,6 +31,21 @@ public class DatabaseService {
         this.restTemplate = restTemplate;
     }
 
+    public HttpResponse<String> createDatabase(String newContent) throws IOException, InterruptedException {
+        String url = notionConfigProps.apiUrl() + "/v1/databases/";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("accept", "application/json")
+                .header("Notion-Version", "2022-06-28")
+                .header("Content-Type", "application/json")
+                .header("Authorization", notionConfigProps.authToken())
+                .method("POST", HttpRequest.BodyPublishers.ofString(newContent))
+                .build();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
+        return response;
+    }
+
     public List<Page> getDatabase(String databaseId) {
 
         String url = notionConfigProps.apiUrl() + "/v1/databases/" + databaseId + "/query";
@@ -56,7 +71,6 @@ public class DatabaseService {
 
     public HttpResponse<String> createPageInDatabase(String newContent) throws IOException, InterruptedException {
         String url = notionConfigProps.apiUrl() + "/v1/pages";
-//        log.info("Querying Notion database: {}", url);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -67,7 +81,22 @@ public class DatabaseService {
                 .method("POST", HttpRequest.BodyPublishers.ofString(newContent))
                 .build();
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.body());
+//        System.out.println(response.body());
+        return response;
+    }
+
+    public HttpResponse<String> updatePageInDatabase(String pageId, String newContent) throws IOException, InterruptedException {
+        String url = notionConfigProps.apiUrl() + "/v1/pages/" + pageId;
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("accept", "application/json")
+                .header("Notion-Version", "2022-06-28")
+                .header("Content-Type", "application/json")
+                .header("Authorization", notionConfigProps.authToken())
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(newContent))
+                .build();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
         return response;
     }
 
@@ -89,6 +118,22 @@ public class DatabaseService {
         return response;
     }
 
+    public HttpResponse<String> getBlockChildren(String blockId) throws IOException, InterruptedException {
+        String url = notionConfigProps.apiUrl() + "/v1/blocks/" + blockId + "/children?page_size=100";
+        log.info("Querying Notion database: {}", url);
 
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("accept", "application/json")
+                .header("Notion-Version", "2022-06-28")
+                .header("Content-Type", "application/json")
+                .header("Authorization", notionConfigProps.authToken())
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+
+
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        return response;
+    }
 
 }

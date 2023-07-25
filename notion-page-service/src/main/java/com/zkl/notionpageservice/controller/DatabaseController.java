@@ -33,8 +33,8 @@ public class DatabaseController {
         return pages.stream().map(TournamentsService::mapPageToTournament).toList();
     }
 
-    @PostMapping
-    public  ResponseEntity<String> createPage() throws IOException, InterruptedException {
+    @PostMapping("/create-page")
+    public ResponseEntity<String> createPage() throws IOException, InterruptedException {
         HttpResponse<String> response = client.databases.createPageInDatabase("test");
         HttpHeaders headers = new HttpHeaders();
         response.headers().map().forEach(headers::addAll);
@@ -57,4 +57,10 @@ public class DatabaseController {
                 .headers(headers)
                 .body(response.body());
     }
+
+    @PostMapping("/create-database")
+    public ResponseEntity<String> createDatabase() {
+        return null;
+    }
+
 }

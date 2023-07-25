@@ -1,8 +1,9 @@
-package com.zkl.tournamentinfoservice.sportsdata.model;
+package com.zkl.notionpageservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 public class PlayerScore {
@@ -20,8 +21,6 @@ public class PlayerScore {
     private Double strokes;
     @JsonProperty("TeeTime")
     private LocalDateTime teeTime;
-//    @JsonProperty("Rounds")
-//    private List<Round> rounds;
     @JsonProperty("Eagles")
     private Double eagles;
     @JsonProperty("Birdies")
@@ -30,6 +29,20 @@ public class PlayerScore {
     private Double pars;
     @JsonProperty("Bogeys")
     private Double bogeys;
+
+    public PlayerScore(String id, String name, Integer rank, String country, Double score, Double strokes, LocalDateTime teeTime, Double eagles, Double birdies, Double pars, Double bogeys) {
+        this.id = id;
+        this.name = name;
+        this.rank = rank;
+        this.country = country;
+        this.score = score;
+        this.strokes = strokes;
+        this.teeTime = teeTime;
+        this.eagles = eagles;
+        this.birdies = birdies;
+        this.pars = pars;
+        this.bogeys = bogeys;
+    }
 
     public String getId() {
         return id;
@@ -117,5 +130,22 @@ public class PlayerScore {
 
     public void setBogeys(Double bogeys) {
         this.bogeys = bogeys;
+    }
+
+    @Override
+    public String toString() {
+        return "PlayerScore{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", rank=" + rank +
+                ", country='" + country + '\'' +
+                ", score=" + score +
+                ", strokes=" + strokes +
+                ", teeTime=" + teeTime +
+                ", eagles=" + eagles +
+                ", birdies=" + birdies +
+                ", pars=" + pars +
+                ", bogeys=" + bogeys +
+                '}';
     }
 }

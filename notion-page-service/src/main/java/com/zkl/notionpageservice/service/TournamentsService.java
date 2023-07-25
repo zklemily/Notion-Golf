@@ -12,6 +12,7 @@ public class TournamentsService {
     public static Tournament mapPageToTournament(Page page) {
 
         return new Tournament(
+                page.getProperties().get("ID").get("rich_text").get(0).get("text").get("content").asText(),
                 page.getProperties().get("Name").get("title").get(0).get("text").get("content").asText(),
                 LocalDate.parse(page.getProperties().get("Date").get("date").get("start").asText()),
                 LocalDate.parse(page.getProperties().get("Date").get("date").get("end").asText()),
