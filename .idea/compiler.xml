@@ -6,12 +6,14 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="leaderboard-info-service" />
         <module name="tournament-info-service" />
         <module name="notion-page-service" />
-        <module name="leaderboard-info-service" />
+        <module name="course-info-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="course-info-service" target="17" />
       <module name="leaderboard-info-service" target="17" />
       <module name="notion-page-service" target="17" />
       <module name="tournament-info-service" target="17" />
@@ -19,6 +21,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="course-info-service" options="-parameters" />
       <module name="leaderboard-info-service" options="-parameters" />
       <module name="notion-page-service" options="-parameters" />
       <module name="tournament-info-service" options="-parameters" />

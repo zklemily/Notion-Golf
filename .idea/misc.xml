@@ -6,6 +6,7 @@
         <option value="$PROJECT_DIR$/notion-page-service/pom.xml" />
         <option value="$PROJECT_DIR$/tournament-info-service/pom.xml" />
         <option value="$PROJECT_DIR$/leaderboard-info-service/pom.xml" />
+        <option value="$PROJECT_DIR$/course-info-service/pom.xml" />
       </list>
     </option>
   </component>

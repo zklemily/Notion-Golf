@@ -3,7 +3,7 @@ package com.zkl.tournamentinfoservice.sportsdata.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zkl.tournamentinfoservice.sportsdata.model.*;
-import com.zkl.tournamentinfoservice.sportsdata.config.SportsdataConfig;
+import com.zkl.tournamentinfoservice.sportsdata.config.SportsDataConfig;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 public class SportsdataService {
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
-    private final SportsdataConfig sportsdataConfig;
+    private final SportsDataConfig sportsdataConfig;
 
-    public SportsdataService(HttpClient httpClient, ObjectMapper objectMapper, SportsdataConfig sportsdataConfig) {
+    public SportsdataService(HttpClient httpClient, ObjectMapper objectMapper, SportsDataConfig sportsdataConfig) {
         this.httpClient = httpClient;
         this.objectMapper = objectMapper;
         this.sportsdataConfig = sportsdataConfig;

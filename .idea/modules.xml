@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/GolfForLife.iml" filepath="$PROJECT_DIR$/.idea/GolfForLife.iml" />
+      <module fileurl="file://$PROJECT_DIR$/course-info-service/course-info-service.iml" filepath="$PROJECT_DIR$/course-info-service/course-info-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/leaderboard-info-service/leaderboard-info-service.iml" filepath="$PROJECT_DIR$/leaderboard-info-service/leaderboard-info-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/notion-page-service/notion-page-service.iml" filepath="$PROJECT_DIR$/notion-page-service/notion-page-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/tournament-info-service/tournament-info-service.iml" filepath="$PROJECT_DIR$/tournament-info-service/tournament-info-service.iml" />
