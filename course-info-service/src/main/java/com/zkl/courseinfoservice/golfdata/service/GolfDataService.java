@@ -20,7 +20,7 @@ public class GolfDataService {
     private final ObjectMapper objectMapper;
     private final GolfDataConfig golfDataConfig;
 
-    public GolfDataService(HttpClient httpClient, ObjectMapper objectMapper, GolfDataConfig golfDataConfig) {
+    public GolfDataService(ObjectMapper objectMapper, GolfDataConfig golfDataConfig) {
         this.objectMapper = objectMapper;
         this.golfDataConfig = golfDataConfig;
     }

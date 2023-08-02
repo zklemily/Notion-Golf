@@ -1,5 +1,6 @@
 package com.zkl.notionpageservice.notion.service;
 
+import com.zkl.notionpageservice.dto.GolfCourse;
 import com.zkl.notionpageservice.dto.PlayerScore;
 import com.zkl.notionpageservice.dto.Tournament;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
@@ -284,6 +285,45 @@ public class JsonService {
                 .put("Bogeys", bogeys);
 
         JSONObject requestBody = new JSONObject().put("properties", properties);
+
+        return requestBody.toString();
+    }
+
+    public String insertGolfCourseJsonPayload(String databaseId, GolfCourse golfCourse) throws JSONException {
+        JSONObject parent = new JSONObject()
+                .put("database_id", databaseId);
+
+        JSONObject name = new JSONObject()
+                .put("title", new JSONArray().put(new JSONObject().put("text", new JSONObject().put("content", golfCourse.getName()))));
+
+        JSONObject country = new JSONObject()
+                .put("select", new JSONObject().put("name", golfCourse.getCountry()));
+
+        JSONObject state = new JSONObject()
+                .put("select", new JSONObject().put("name", golfCourse.getState()));
+
+        JSONObject courseId = new JSONObject()
+                .put("rich_text", new JSONArray().put(new JSONObject().put("text", new JSONObject().put("content", golfCourse.getId()))));
+
+        JSONObject address = new JSONObject()
+                .put("rich_text", new JSONArray().put(new JSONObject().put("text", new JSONObject().put("content", golfCourse.getAddress() + ", " + golfCourse.getCity()))));
+
+        JSONObject holes = new JSONObject()
+                .put("select", new JSONObject().put("name", golfCourse.getHoles()));
+
+        JSONObject website = new JSONObject()
+                .put("url", golfCourse.getWebsite());
+
+        JSONObject properties = new JSONObject()
+                .put("Name", name)
+                .put("Country", country)
+                .put("Address", address)
+                .put("Course ID", courseId)
+                .put("State", state)
+                .put("Holes", holes)
+                .put("Website", website);
+
+        JSONObject requestBody = new JSONObject().put("parent", parent).put("properties", properties);
 
         return requestBody.toString();
     }

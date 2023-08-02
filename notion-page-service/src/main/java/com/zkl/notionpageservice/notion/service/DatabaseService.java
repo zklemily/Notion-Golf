@@ -151,4 +151,22 @@ public class DatabaseService {
         return response;
     }
 
+    public HttpResponse<String> createBlock(String parentId, String content) throws IOException, InterruptedException {
+        String url = notionConfigProps.apiUrl() + "/v1/blocks/" + parentId + "/children";
+
+        log.info("Querying Notion database: {}", url);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("accept", "application/json")
+                .header("Notion-Version", "2022-06-28")
+                .header("Content-Type", "application/json")
+                .header("Authorization", notionConfigProps.authToken())
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(content))
+                .build();
+
+
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        return response;
+    }
 }

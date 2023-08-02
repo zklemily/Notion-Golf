@@ -1,4 +1,4 @@
-package com.zkl.courseinfoservice.golfdata.model;
+package com.zkl.notionpageservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

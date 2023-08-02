@@ -1,13 +1,10 @@
 package com.zkl.notionpageservice.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zkl.notionpageservice.dto.News;
-import com.zkl.notionpageservice.dto.PlayerScore;
+import com.zkl.notionpageservice.dto.*;
 import com.zkl.notionpageservice.notion.NotionClient;
 import com.zkl.notionpageservice.notion.config.NotionConfigProperties;
-import com.zkl.notionpageservice.dto.Tournament;
 import com.zkl.notionpageservice.notion.model.Block;
 import com.zkl.notionpageservice.notion.model.BlockResult;
 import com.zkl.notionpageservice.notion.model.Database;
@@ -223,5 +220,46 @@ public class MainController {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @GetMapping("/get-course-name")
+    public String getCourseName() throws IOException, InterruptedException {
+        String blockId = "0055469241594427a3095ec7c687501c";
+        HttpResponse<String> blockResponse = client.databases.getBlock(blockId);
+        Block block = objectMapper.readValue(blockResponse.body(), Block.class);
+        return block.getParagraph().get("rich_text").get(0).get("text").get("content").asText();
+    }
+
+    @GetMapping("/update-course")
+    public ResponseEntity<String> updateCourse() throws IOException, InterruptedException, JSONException {
+        String databaseId = "ee582466445047cf8a35a495e3f273c2";
+
+        String getCourseUrl = "http://localhost:8082/golf-course/{" + getCourseName() + "}";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(getCourseUrl))
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
+
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        List<GolfCourse> courses = objectMapper.readValue(response.body(), new TypeReference<>() {});
+
+        if (courses.isEmpty()) {
+            return ResponseEntity.ok("No courses found.");
+        }
+
+        for (GolfCourse golfCourse : courses) {
+            // insert golf course as page in database
+            String courseJson = jsonService.insertGolfCourseJsonPayload(databaseId, golfCourse);
+            HttpResponse<String> createPageResponse = client.databases.createPageInDatabase(courseJson);
+
+            // insert scorecard into page
+            Page page = objectMapper.readValue(createPageResponse.body(), Page.class);
+            String pageId = page.getId();
+            List<Scorecard> scorecards = golfCourse.getScorecard();
+        }
+        return ResponseEntity.ok("Courses are added to database.");
     }
 }
