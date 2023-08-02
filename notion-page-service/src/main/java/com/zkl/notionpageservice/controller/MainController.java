@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.PatternSyntaxException;
@@ -233,8 +235,7 @@ public class MainController {
     @GetMapping("/update-course")
     public ResponseEntity<String> updateCourse() throws IOException, InterruptedException, JSONException {
         String databaseId = "ee582466445047cf8a35a495e3f273c2";
-
-        String getCourseUrl = "http://localhost:8082/golf-course/{" + getCourseName() + "}";
+        String getCourseUrl = "http://localhost:8082/golf-course/" + URLEncoder.encode(getCourseName(), StandardCharsets.UTF_8);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(getCourseUrl))
                 .header("Content-Type", "application/json")
@@ -259,7 +260,42 @@ public class MainController {
             Page page = objectMapper.readValue(createPageResponse.body(), Page.class);
             String pageId = page.getId();
             List<Scorecard> scorecards = golfCourse.getScorecard();
+            Map<String, Map<Integer, Integer>> colorYardsMap = getColorYardsMap(scorecards);
+            String scorecardPayload = jsonService.createScorecardTableJsonPayload(scorecards, colorYardsMap);
+            client.databases.createBlock(pageId, scorecardPayload);
         }
-        return ResponseEntity.ok("Courses are added to database.");
+        return ResponseEntity.ok("Courses and scorecards are added to database.");
+    }
+
+    private Map<String, Map<Integer, Integer>> getColorYardsMap(List<Scorecard> scorecards) {
+        // Create a map to store color and its corresponding yards for each hole
+        Map<String, Map<Integer, Integer>> colorYardsMap = new HashMap<>();
+
+        // Iterate through the list of Scorecard objects and populate the map
+        for (Scorecard scorecard : scorecards) {
+            int holeNumber = scorecard.getHole();
+            Map<String, TeeBox> tees = scorecard.getTees();
+
+            // Iterate through the tees and update the map for each hole
+            for (TeeBox tee : tees.values()) {
+                String color = tee.getColor();
+                int yards = tee.getYards();
+
+                if (yards == 0) {
+                    continue;
+                }
+
+                if (!colorYardsMap.containsKey(color)) {
+                    Map<Integer, Integer> holeAndYards = new HashMap<>();
+                    holeAndYards.put(holeNumber, yards);
+                    colorYardsMap.put(color, holeAndYards);
+                } else {
+                    colorYardsMap.get(color).put(holeNumber, yards);
+                }
+
+            }
+        }
+
+        return colorYardsMap;
     }
 }

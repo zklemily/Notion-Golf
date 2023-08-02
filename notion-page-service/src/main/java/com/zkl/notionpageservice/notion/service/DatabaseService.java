@@ -167,6 +167,8 @@ public class DatabaseService {
 
 
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println("Here: ");
+        System.out.println(response.body());
         return response;
     }
 }

@@ -1,8 +1,6 @@
 package com.zkl.notionpageservice.notion.service;
 
-import com.zkl.notionpageservice.dto.GolfCourse;
-import com.zkl.notionpageservice.dto.PlayerScore;
-import com.zkl.notionpageservice.dto.Tournament;
+import com.zkl.notionpageservice.dto.*;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -10,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class JsonService {
@@ -324,6 +324,86 @@ public class JsonService {
                 .put("Website", website);
 
         JSONObject requestBody = new JSONObject().put("parent", parent).put("properties", properties);
+
+        return requestBody.toString();
+    }
+
+    public String createScorecardTableJsonPayload(List<Scorecard> scorecards, Map<String, Map<Integer, Integer>> colorYardsMap) throws JSONException {
+
+        JSONArray tableChildren = new JSONArray();
+
+        // row: header
+        JSONArray headerRowCells = new JSONArray();
+        for (int i = 0; i <= scorecards.size(); i++) {
+            String content;
+            if (i == 0) {
+                content = "Hole";
+            } else {
+                content = String.valueOf(i);
+            }
+            JSONObject cell = new JSONObject().put("type", "text").put("text", new JSONObject().put("content", content));
+            headerRowCells.put(new JSONArray().put(cell));
+        }
+
+        tableChildren.put(new JSONObject()
+                .put("type", "table_row")
+                .put("table_row", new JSONObject().put("cells", headerRowCells)));
+
+        // row: Par
+        JSONArray parRowCells = new JSONArray();
+        parRowCells.put(new JSONArray().put(new JSONObject()
+                .put("type", "text")
+                .put("text", new JSONObject().put("content", "Par"))));
+        for (Scorecard scorecard : scorecards) {
+            JSONObject cell = new JSONObject().put("type", "text").put("text", new JSONObject().put("content", String.valueOf(scorecard.getPar())));
+            parRowCells.put(new JSONArray().put(cell));
+        }
+
+        tableChildren.put(new JSONObject()
+                .put("type", "table_row")
+                .put("table_row", new JSONObject().put("cells", parRowCells)));
+
+        // row: blue/red/black tee for every color
+        for (Map.Entry<String, Map<Integer, Integer>> colorAndYards : colorYardsMap.entrySet()) {
+            JSONArray colorRowCells = new JSONArray();
+            colorRowCells.put(new JSONArray().put(new JSONObject()
+                    .put("type", "text")
+                    .put("text", new JSONObject().put("content", colorAndYards.getKey()))));
+            for (int i = 1; i <= colorAndYards.getValue().size(); i++) {
+                int yard = colorAndYards.getValue().get(i);
+                colorRowCells.put(new JSONArray().put(new JSONObject()
+                        .put("type", "text")
+                        .put("text", new JSONObject().put("content", String.valueOf(yard)))));
+            }
+            tableChildren.put(new JSONObject()
+                    .put("type", "table_row")
+                    .put("table_row", new JSONObject().put("cells", colorRowCells)));
+        }
+
+        // row: Handicap
+        JSONArray handicapRowCells = new JSONArray();
+        handicapRowCells.put(new JSONArray().put(new JSONObject()
+                .put("type", "text")
+                .put("text", new JSONObject().put("content", "Handicap"))));
+        for (Scorecard scorecard : scorecards) {
+            JSONObject cell = new JSONObject().put("type", "text").put("text", new JSONObject().put("content", String.valueOf(scorecard.getHandicap())));
+            handicapRowCells.put(new JSONArray().put(cell));
+        }
+        tableChildren.put(new JSONObject()
+                .put("type", "table_row")
+                .put("table_row", new JSONObject().put("cells", handicapRowCells)));
+
+        JSONObject tableInfo = new JSONObject()
+                .put("table_width", scorecards.size() + 1)
+                .put("has_column_header", true)
+                .put("has_row_header", true)
+                .put("children", tableChildren);
+
+        JSONObject requestBody = new JSONObject()
+                .put("children", new JSONArray().put(new JSONObject()
+                        .put("object", "block")
+                        .put("type", "table")
+                        .put("table", tableInfo)));
 
         return requestBody.toString();
     }

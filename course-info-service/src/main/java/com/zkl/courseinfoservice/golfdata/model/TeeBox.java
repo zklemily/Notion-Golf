@@ -24,4 +24,12 @@ public class TeeBox {
     public void setYards(int yards) {
         this.yards = yards;
     }
+
+    @Override
+    public String toString() {
+        return "TeeBox{" +
+                "color='" + color + '\'' +
+                ", yards=" + yards +
+                '}';
+    }
 }

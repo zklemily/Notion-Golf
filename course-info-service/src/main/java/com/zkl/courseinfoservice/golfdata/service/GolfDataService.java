@@ -26,6 +26,7 @@ public class GolfDataService {
     }
 
     public List<GolfCourse> getGolfCourses(String name) throws IOException, InterruptedException {
+        System.out.println("The name is: " + name);
         String url = golfDataConfig.getApiUrl() + name;
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))

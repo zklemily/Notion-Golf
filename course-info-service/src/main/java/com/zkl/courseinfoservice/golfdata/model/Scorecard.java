@@ -1,11 +1,16 @@
 package com.zkl.courseinfoservice.golfdata.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Map;
 
 public class Scorecard {
+    @JsonProperty("Hole")
     private int hole;
+    @JsonProperty("Par")
     private int par;
     private Map<String, TeeBox> tees;
+    @JsonProperty("Handicap")
     private int handicap;
 
     public Scorecard(int hole, int par, Map<String, TeeBox> tees, int handicap) {

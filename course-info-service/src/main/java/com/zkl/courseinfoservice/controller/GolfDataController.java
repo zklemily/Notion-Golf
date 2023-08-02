@@ -23,7 +23,6 @@ public class GolfDataController {
 
     @GetMapping("/{name}")
     public List<GolfCourse> getGolfCourses(@PathVariable("name") String name) throws IOException, InterruptedException {
-        String encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
-        return golfDataService.getGolfCourses(encodedName);
+        return golfDataService.getGolfCourses(name);
     }
 }
