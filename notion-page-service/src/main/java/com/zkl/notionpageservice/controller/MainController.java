@@ -10,6 +10,7 @@ import com.zkl.notionpageservice.notion.model.BlockResult;
 import com.zkl.notionpageservice.notion.model.Database;
 import com.zkl.notionpageservice.notion.model.Page;
 import com.zkl.notionpageservice.notion.service.JsonService;
+import com.zkl.notionpageservice.service.RoundService;
 import com.zkl.notionpageservice.service.TournamentsService;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpHeaders;
@@ -24,7 +25,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.PatternSyntaxException;
 
@@ -297,5 +297,17 @@ public class MainController {
         }
 
         return colorYardsMap;
+    }
+
+    @GetMapping("/round-data")
+    public ResponseEntity<String> getRoundData() {
+        String databaseId = "60122f753606459aa2a42e108cb6b462";
+        List<Page> pages = client.databases.getDatabase(databaseId);
+        List<Round> databaseRounds = new ArrayList<>(pages.stream().map(RoundService::mapPageToRound).toList());
+        databaseRounds.removeIf(round -> round.getTotalStrokes() == 0);
+        for (Round round : databaseRounds) {
+            String coursePageId = round.getCoursePageId();
+        }
+        return null;
     }
 }
