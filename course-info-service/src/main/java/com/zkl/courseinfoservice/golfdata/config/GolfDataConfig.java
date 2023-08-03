@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class GolfDataConfig {
     private String apiUrl;
     private String authToken;
+    private String authHost;
 
     public String getApiUrl() {
         return apiUrl;
@@ -23,5 +24,13 @@ public class GolfDataConfig {
 
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
+    }
+
+    public String getAuthHost() {
+        return authHost;
+    }
+
+    public void setAuthHost(String authHost) {
+        this.authHost = authHost;
     }
 }
