@@ -3,6 +3,8 @@ package com.zkl.notionpageservice.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Round {
     @JsonProperty("Hole 1")
@@ -89,6 +91,14 @@ public class Round {
         this.birdies = birdies;
         this.bogies = bogies;
         this.date = date;
+    }
+
+    public int[] getAllHoles() {
+        return new int[] {
+                hole1, hole2, hole3, hole4, hole5, hole6,
+                hole7, hole8, hole9, hole10, hole11, hole12,
+                hole13, hole14, hole15, hole16, hole17, hole18
+        };
     }
 
     public int getHole1() {

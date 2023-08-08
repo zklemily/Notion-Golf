@@ -407,4 +407,28 @@ public class JsonService {
 
         return requestBody.toString();
     }
+
+    public String updateUserScoreJsonPayload(int[] scores) throws JSONException {
+        JSONObject totalScore = new JSONObject()
+                .put("number", scores[0]);
+        JSONObject eagles = new JSONObject()
+                .put("number", scores[1]);
+        JSONObject birdies = new JSONObject()
+                .put("number", scores[2]);
+        JSONObject pars = new JSONObject()
+                .put("number", scores[3]);
+        JSONObject bogies = new JSONObject()
+                .put("number", scores[4]);
+
+        JSONObject properties = new JSONObject()
+                .put("Score", totalScore)
+                .put("Eagles", eagles)
+                .put("Birdies", birdies)
+                .put("Pars", pars)
+                .put("Bogies", bogies);
+
+        JSONObject requestBody = new JSONObject().put("properties", properties);
+
+        return requestBody.toString();
+    }
 }

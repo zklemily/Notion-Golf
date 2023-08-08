@@ -300,14 +300,66 @@ public class MainController {
     }
 
     @GetMapping("/round-data")
-    public ResponseEntity<String> getRoundData() {
+    public ResponseEntity<String> getRoundData() throws IOException, InterruptedException, JSONException {
         String databaseId = "60122f753606459aa2a42e108cb6b462";
         List<Page> pages = client.databases.getDatabase(databaseId);
         List<Round> databaseRounds = new ArrayList<>(pages.stream().map(RoundService::mapPageToRound).toList());
         databaseRounds.removeIf(round -> round.getTotalStrokes() == 0);
         for (Round round : databaseRounds) {
+            int[] userScores = round.getAllHoles();
+
             String coursePageId = round.getCoursePageId();
+            HttpResponse<String> getPageResponse = client.databases.getPage(coursePageId);
+            Page page = objectMapper.readValue(getPageResponse.body(), Page.class);
+
+            String golfCourseName = page.getProperties().get("Name").get("title").get(0).get("text").get("content").asText();
+            String getCourseUrl = "http://localhost:8082/golf-course/" + URLEncoder.encode(golfCourseName, StandardCharsets.UTF_8);
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(getCourseUrl))
+                    .header("Content-Type", "application/json")
+                    .GET()
+                    .build();
+            HttpClient httpClient = HttpClient.newHttpClient();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            List<GolfCourse> courses = objectMapper.readValue(response.body(), new TypeReference<>() {});
+            List<Scorecard> scorecards = courses.get(0).getScorecard();
+
+            int eagles = 0;
+            int pars = 0;
+            int birdies = 0;
+            int bogies = 0;
+            int total = 0;
+
+            for (int i = 1; i <= scorecards.size(); i++) {
+                int par = getHoleInfo(scorecards, i);
+                int userScoreVal = userScores[i-1];
+                if (userScoreVal == 0) {
+                    break;
+                }
+                if (userScoreVal - par == 0) {
+                    pars++;
+                } else if (userScoreVal - par == -2) {
+                    eagles++;
+                } else if (userScoreVal - par == -1) {
+                    birdies++;
+                } else if (userScoreVal - par == 1) {
+                    bogies++;
+                }
+                total += (userScoreVal - par);
+            }
+
+            int[] results = new int[] {total, eagles, birdies, pars, bogies};
+            String userScoreJson = jsonService.updateUserScoreJsonPayload(results);
         }
         return null;
+    }
+
+    private static int getHoleInfo(List<Scorecard> scorecards, int hole) {
+        for (Scorecard scorecard : scorecards) {
+            if (scorecard.getHole() == hole) {
+                return scorecard.getPar();
+            }
+        }
+        return -1;
     }
 }

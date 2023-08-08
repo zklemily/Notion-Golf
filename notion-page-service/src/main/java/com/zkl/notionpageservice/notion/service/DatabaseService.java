@@ -66,6 +66,22 @@ public class DatabaseService {
         return headers;
     }
 
+    public HttpResponse<String> getPage(String pageId) throws IOException, InterruptedException {
+        String url = notionConfigProps.apiUrl() + "/v1/pages" + pageId;
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("accept", "application/json")
+                .header("Notion-Version", "2022-06-28")
+                .header("Content-Type", "application/json")
+                .header("Authorization", notionConfigProps.authToken())
+                .method("POST", HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+//        System.out.println(response.body());
+        return response;
+    }
+
     public HttpResponse<String> createPageInDatabase(String newContent) throws IOException, InterruptedException {
         String url = notionConfigProps.apiUrl() + "/v1/pages";
 
