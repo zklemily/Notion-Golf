@@ -305,9 +305,11 @@ public class MainController {
         List<Page> pages = client.databases.getDatabase(databaseId);
         List<Round> databaseRounds = new ArrayList<>(pages.stream().map(RoundService::mapPageToRound).toList());
         databaseRounds.removeIf(round -> round.getTotalStrokes() == 0);
-        for (Round round : databaseRounds) {
+        for (int i = 0; i < databaseRounds.size(); i++) {
+            Page curPage = pages.get(i);
+            Round round = databaseRounds.get(i);
             int[] userScores = round.getAllHoles();
-
+            // find the corresponding course and score card
             String coursePageId = round.getCoursePageId();
             HttpResponse<String> getPageResponse = client.databases.getPage(coursePageId);
             Page page = objectMapper.readValue(getPageResponse.body(), Page.class);
@@ -324,34 +326,41 @@ public class MainController {
             List<GolfCourse> courses = objectMapper.readValue(response.body(), new TypeReference<>() {});
             List<Scorecard> scorecards = courses.get(0).getScorecard();
 
-            int eagles = 0;
-            int pars = 0;
-            int birdies = 0;
-            int bogies = 0;
-            int total = 0;
-
-            for (int i = 1; i <= scorecards.size(); i++) {
-                int par = getHoleInfo(scorecards, i);
-                int userScoreVal = userScores[i-1];
-                if (userScoreVal == 0) {
-                    break;
-                }
-                if (userScoreVal - par == 0) {
-                    pars++;
-                } else if (userScoreVal - par == -2) {
-                    eagles++;
-                } else if (userScoreVal - par == -1) {
-                    birdies++;
-                } else if (userScoreVal - par == 1) {
-                    bogies++;
-                }
-                total += (userScoreVal - par);
-            }
-
-            int[] results = new int[] {total, eagles, birdies, pars, bogies};
+            // calculate user scores
+            int[] results = calculateScore(scorecards, userScores);
+            // update in database
             String userScoreJson = jsonService.updateUserScoreJsonPayload(results);
+            client.databases.updatePageInDatabase(curPage.getId(), userScoreJson);
         }
-        return null;
+        return ResponseEntity.ok("Scores are calculated.");
+    }
+
+    private static int[] calculateScore(List<Scorecard> scorecards, int[] userScores) {
+        int eagles = 0;
+        int pars = 0;
+        int birdies = 0;
+        int bogies = 0;
+        int total = 0;
+
+        for (int i = 1; i <= scorecards.size(); i++) {
+            int par = getHoleInfo(scorecards, i);
+            int userScoreVal = userScores[i-1];
+            if (userScoreVal == 0) {
+                break;
+            }
+            if (userScoreVal - par == 0) {
+                pars++;
+            } else if (userScoreVal - par == -2) {
+                eagles++;
+            } else if (userScoreVal - par == -1) {
+                birdies++;
+            } else if (userScoreVal - par == 1) {
+                bogies++;
+            }
+            total += (userScoreVal - par);
+        }
+
+        return new int[] {total, eagles, birdies, pars, bogies};
     }
 
     private static int getHoleInfo(List<Scorecard> scorecards, int hole) {
